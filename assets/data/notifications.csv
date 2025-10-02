@@ -1,0 +1,6 @@
+ID,Title,Body,Created,IsRead,Payload
+rec1,New Lead Assigned,You have been assigned a new lead: John Smith,2023-06-15T09:30:00Z,false,/leads/recLead123
+rec2,Task Due Reminder,Reminder: Follow up with Jane Doe is due today,2023-06-15T08:15:00Z,false,/tasks/recTask456
+rec3,Lead Status Updated,Lead status for Michael Johnson has been updated to Qualified,2023-06-14T14:20:00Z,true,/leads/recLead789
+rec4,New Note Added,A note has been added to the lead Sarah Williams,2023-06-14T11:45:00Z,true,/notes/recNote101
+rec5,Task Completed,Task "Send proposal to ABC Company" has been marked as completed,2023-06-13T16:10:00Z,true,/tasks/recTask202

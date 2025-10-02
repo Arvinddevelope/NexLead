@@ -1,0 +1,15 @@
+Field Name,Field Type,Description,Required
+Name,Single line text,Lead's full name,Yes
+Email,Email,Lead's email address,Yes
+Phone,Phone number,Lead's phone number,No
+Company,Single line text,Lead's company/organization,No
+Source,Single select,Lead source (Website, Referral, Social Media, etc.),No
+Status,Single select,Lead status (New, Contacted, Qualified, etc.),Yes
+Notes,Long text,Additional notes about the lead,No
+Created At,Created time,Timestamp when record was created,Yes
+Updated At,Last modified time,Timestamp when record was last updated,Yes
+Next Follow-up,Date,Date for next follow-up activity,No
+User,Linked record,User who owns this lead,No
+Contact Name,Single line text,Contact person's name,No
+Last Status,Single line text,Last known status of the lead,No
+Last SOURCE,Single line text,Last known source of the lead,No

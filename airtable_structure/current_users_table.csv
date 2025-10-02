@@ -1,0 +1,8 @@
+Field Name,Field Type,Description,Required
+Role,Single line text,User role/position,Yes
+Active,Checkbox,Whether user account is active,Yes
+Leads,Linked record,Linked records to Leads table,No
+Notes,Linked record,Linked records to Notes table,No
+Tasks,Linked record,Linked records to Tasks table,No
+Created At,Created time,Timestamp when record was created,Yes
+Updated At,Last modified time,Timestamp when record was last updated,Yes

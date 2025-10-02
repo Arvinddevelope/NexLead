@@ -1,0 +1,6 @@
+Field Name,Field Type,Description,Required
+Name,Single line text,User's full name,Yes
+Email,Email,User's email address (unique),Yes
+Password,Single line text,User's password (hashed in production),Yes
+Created At,Created time,Timestamp when user was created,Yes
+Updated At,Last modified time,Timestamp when user was last updated,Yes

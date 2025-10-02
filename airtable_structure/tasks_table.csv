@@ -1,0 +1,8 @@
+Field Name,Field Type,Description,Required,Linked Table
+Lead ID,Linked record,Reference to Leads table,Yes,Leads
+Title,Single line text,Task title,Yes,No
+Description,Long text,Task description,No,No
+Due Date,Date,Task deadline,Yes,No
+Completed,Checkbox,Task completion status,Yes,No
+Created At,Created time,Timestamp when task was created,Yes,No
+Updated At,Last modified time,Timestamp when task was last updated,Yes,No
