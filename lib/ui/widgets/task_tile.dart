@@ -75,14 +75,14 @@ class TaskTile extends StatelessWidget {
           itemBuilder: (context) => [
             PopupMenuItem(
               value: 'delete',
+              onTap: onDelete,
               child: const Row(
                 children: [
                   Icon(Icons.delete, color: AppColors.statusLost),
                   SizedBox(width: 8),
                   Text('Delete'),
                 ],
-              ),
-              onTap: onDelete, // Call onDelete when tapped
+              ), // Call onDelete when tapped
             ),
           ],
         ),

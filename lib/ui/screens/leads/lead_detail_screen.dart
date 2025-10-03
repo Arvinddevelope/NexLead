@@ -5,6 +5,7 @@ import 'package:nextlead/core/constants/app_colors.dart';
 import 'package:nextlead/core/constants/app_texts.dart';
 import 'package:nextlead/core/utils/helpers.dart';
 import 'package:nextlead/data/models/lead_model.dart';
+import 'package:nextlead/providers/lead_provider.dart';
 import 'package:nextlead/providers/note_provider.dart';
 import 'package:nextlead/providers/task_provider.dart';
 import 'package:nextlead/routes/app_routes.dart';
@@ -21,15 +22,18 @@ class LeadDetailScreen extends StatefulWidget {
 }
 
 class _LeadDetailScreenState extends State<LeadDetailScreen> {
+  late Lead _currentLead;
+
   @override
   void initState() {
     super.initState();
+    _currentLead = widget.lead;
     // Load notes and tasks for this lead
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final noteProvider = Provider.of<NoteProvider>(context, listen: false);
       final taskProvider = Provider.of<TaskProvider>(context, listen: false);
 
-      noteProvider.loadNotes(widget.lead.id);
+      noteProvider.loadNotes(_currentLead.id);
       taskProvider.loadTasks(); // This will load all tasks, we'll filter in UI
     });
   }
@@ -74,16 +78,43 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
       length: 3,
       child: Scaffold(
         appBar: AppBar(
-          title: Text(widget.lead.name),
+          title: Text(_currentLead.name),
           actions: [
             IconButton(
               icon: const Icon(Icons.edit),
-              onPressed: () {
-                Navigator.pushNamed(
+              onPressed: () async {
+                final result = await Navigator.pushNamed(
                   context,
                   AppRoutes.leadForm,
-                  arguments: widget.lead,
+                  arguments: _currentLead,
                 );
+
+                // If the form was saved successfully, refresh the lead data
+                if (result == true && mounted) {
+                  // Reload the lead data from the provider
+                  final leadProvider =
+                      Provider.of<LeadProvider>(context, listen: false);
+                  try {
+                    final updatedLead =
+                        await leadProvider.getLeadById(_currentLead.id);
+                    // Update the current lead state
+                    if (mounted) {
+                      setState(() {
+                        _currentLead = updatedLead;
+                      });
+                    }
+                  } catch (e) {
+                    // Handle error
+                    if (mounted) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to refresh lead data: $e'),
+                          backgroundColor: AppColors.statusLost,
+                        ),
+                      );
+                    }
+                  }
+                }
               },
             ),
           ],
@@ -122,20 +153,20 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
               vertical: 6,
             ),
             decoration: BoxDecoration(
-              color: _getStatusColor(widget.lead.status),
+              color: _getStatusColor(_currentLead.status),
               borderRadius: BorderRadius.circular(20),
             ),
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
                 Icon(
-                  _getStatusIcon(widget.lead.status),
+                  _getStatusIcon(_currentLead.status),
                   size: 16,
                   color: AppColors.white,
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  widget.lead.status,
+                  _currentLead.status,
                   style: const TextStyle(
                     color: AppColors.white,
                     fontSize: 14,
@@ -156,25 +187,47 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
             ),
           ),
           const SizedBox(height: 16),
-          if (widget.lead.contactName != null &&
-              widget.lead.contactName!.isNotEmpty)
-            _buildInfoRow('Contact Name', widget.lead.contactName!),
-          _buildInfoRow('Company', widget.lead.company),
-          _buildInfoRow('Email', widget.lead.email),
-          _buildInfoRow('Phone', widget.lead.phone),
-          _buildInfoRow('Source', widget.lead.source),
+          if (_currentLead.contactName != null &&
+              _currentLead.contactName!.isNotEmpty)
+            _buildInfoRow('Contact Name', _currentLead.contactName!),
+          _buildInfoRow('Company', _currentLead.company),
+          _buildInfoRow('Email', _currentLead.email),
+          _buildInfoRow('Phone', _currentLead.phone),
+          _buildInfoRow('Source', _currentLead.source),
 
           const SizedBox(height: 20),
 
           // Communication Features
-          if (widget.lead.phone.isNotEmpty || widget.lead.email.isNotEmpty)
+          if (_currentLead.phone.isNotEmpty || _currentLead.email.isNotEmpty)
             CommunicationFeatures(
-              phoneNumber: widget.lead.phone,
-              email: widget.lead.email,
-              leadName: widget.lead.name,
+              phoneNumber: _currentLead.phone,
+              email: _currentLead.email,
+              leadName: _currentLead.name,
             ),
-          if (widget.lead.phone.isNotEmpty || widget.lead.email.isNotEmpty)
+          if (_currentLead.phone.isNotEmpty || _currentLead.email.isNotEmpty)
             const SizedBox(height: 20),
+
+          // Location Information
+          if (_currentLead.latitude != null && _currentLead.longitude != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Location',
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
+                if (_currentLead.locationAddress != null &&
+                    _currentLead.locationAddress!.isNotEmpty)
+                  _buildInfoRow('Address', _currentLead.locationAddress!),
+                _buildInfoRow('Latitude', _currentLead.latitude.toString()),
+                _buildInfoRow('Longitude', _currentLead.longitude.toString()),
+                const SizedBox(height: 16),
+              ],
+            ),
 
           // Dates
           const Text(
@@ -186,12 +239,12 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
           ),
           const SizedBox(height: 16),
           _buildInfoRow(
-              'Created', Helpers.formatDateTime(widget.lead.createdAt)),
+              'Created', Helpers.formatDateTime(_currentLead.createdAt)),
           _buildInfoRow(
-              'Updated', Helpers.formatDateTime(widget.lead.updatedAt)),
-          if (widget.lead.nextFollowUp != null)
+              'Updated', Helpers.formatDateTime(_currentLead.updatedAt)),
+          if (_currentLead.nextFollowUp != null)
             _buildInfoRow('Next Follow-up',
-                Helpers.formatDateTime(widget.lead.nextFollowUp!)),
+                Helpers.formatDateTime(_currentLead.nextFollowUp!)),
 
           const SizedBox(height: 20),
 
@@ -212,7 +265,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
               border: Border.all(color: AppColors.gray300),
             ),
             child: Text(
-              widget.lead.notes.isEmpty ? 'No notes' : widget.lead.notes,
+              _currentLead.notes.isEmpty ? 'No notes' : _currentLead.notes,
               style: const TextStyle(
                 fontSize: 14,
                 color: AppColors.gray700,
@@ -258,7 +311,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
   Widget _buildNotesTab() {
     return Consumer<NoteProvider>(
       builder: (context, noteProvider, child) {
-        final notes = noteProvider.getNotesByLeadId(widget.lead.id);
+        final notes = noteProvider.getNotesByLeadId(_currentLead.id);
 
         if (noteProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -294,7 +347,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
   Widget _buildTasksTab() {
     return Consumer<TaskProvider>(
       builder: (context, taskProvider, child) {
-        final tasks = taskProvider.getTasksByLeadId(widget.lead.id);
+        final tasks = taskProvider.getTasksByLeadId(_currentLead.id);
 
         if (taskProvider.isLoading) {
           return const Center(child: CircularProgressIndicator());
@@ -344,7 +397,7 @@ class _LeadDetailScreenState extends State<LeadDetailScreen> {
             TextButton(
               onPressed: () {
                 Navigator.pop(context);
-                noteProvider.deleteNote(noteId, widget.lead.id);
+                noteProvider.deleteNote(noteId, _currentLead.id);
               },
               child: const Text(AppTexts.delete),
             ),
@@ -497,7 +550,14 @@ class CommunicationFeatures extends StatelessWidget {
   Future<void> _launchWhatsApp(
       BuildContext context, String phoneNumber, String message) async {
     // Remove any non-digit characters from phone number
-    final cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    String cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+
+    // Add country code 91 if not already present and number length suggests Indian number
+    // Indian mobile numbers are 10 digits, so if we have 10 digits, add 91 prefix
+    if (cleanPhoneNumber.length == 10) {
+      cleanPhoneNumber = '91$cleanPhoneNumber';
+    }
+
     final Uri launchUri = Uri(
       scheme: 'https',
       host: 'wa.me',

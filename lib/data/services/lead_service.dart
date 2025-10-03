@@ -47,6 +47,10 @@ class LeadService {
               fields['Lead Owner']), // Correct field name is "Lead Owner"
           contactName:
               _getStringValue(fields['Contact Name']), // Add contactName field
+          // Location fields
+          latitude: fields['Latitude'] as double?,
+          longitude: fields['Longitude'] as double?,
+          locationAddress: _getStringValue(fields['Location Address']),
         );
       }).toList();
     } catch (e) {
@@ -80,6 +84,10 @@ class LeadService {
             fields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName:
             _getStringValue(fields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: fields['Latitude'] as double?,
+        longitude: fields['Longitude'] as double?,
+        locationAddress: _getStringValue(fields['Location Address']),
       );
     } catch (e) {
       throw Exception('Failed to fetch lead: $e');
@@ -116,6 +124,10 @@ class LeadService {
               fields['Lead Owner']), // Correct field name is "Lead Owner"
           contactName:
               _getStringValue(fields['Contact Name']), // Add contactName field
+          // Location fields
+          latitude: fields['Latitude'] as double?,
+          longitude: fields['Longitude'] as double?,
+          locationAddress: _getStringValue(fields['Location Address']),
         );
       }).toList();
     } catch (e) {
@@ -175,8 +187,18 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
-      // Do NOT send 'Created At' and 'Updated At' as they are computed fields in Airtable
-      // Airtable will automatically set these values
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
+      // Do NOT send 'Updated At' as it is a computed field in Airtable
+      // Airtable will automatically update this value
 
       // Handle Next Follow-up field with proper date format
       if (lead.nextFollowUp != null) {
@@ -209,6 +231,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       // Handle different types of errors
@@ -284,6 +310,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send 'Updated At' as it is a computed field in Airtable
       // Airtable will automatically update this value
 
@@ -319,6 +355,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       // Handle different types of errors
@@ -378,6 +418,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -411,6 +461,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -440,6 +494,16 @@ class LeadService {
       // Add new fields if available (only fields that exist in Airtable)
       if (lead.contactName != null && lead.contactName!.isNotEmpty) {
         fields['Contact Name'] = lead.contactName;
+      }
+
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
       }
 
       // Do NOT send computed fields
@@ -476,6 +540,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -517,6 +585,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -550,6 +628,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -591,6 +673,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -625,6 +717,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -671,6 +767,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -704,6 +810,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -750,6 +860,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -784,6 +904,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -851,6 +975,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -884,6 +1018,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(
@@ -926,6 +1064,16 @@ class LeadService {
         fields['Contact Name'] = lead.contactName;
       }
 
+      // Add location fields if available
+      if (lead.latitude != null && lead.longitude != null) {
+        fields['Latitude'] = lead.latitude;
+        fields['Longitude'] = lead.longitude;
+      }
+
+      if (lead.locationAddress != null && lead.locationAddress!.isNotEmpty) {
+        fields['Location Address'] = lead.locationAddress;
+      }
+
       // Do NOT send computed fields
 
       // Handle Next Follow-up field with proper date format
@@ -960,6 +1108,10 @@ class LeadService {
             recordFields['Lead Owner']), // Correct field name is "Lead Owner"
         contactName: _getStringValue(
             recordFields['Contact Name']), // Add contactName field
+        // Location fields
+        latitude: recordFields['Latitude'] as double?,
+        longitude: recordFields['Longitude'] as double?,
+        locationAddress: _getStringValue(recordFields['Location Address']),
       );
     } catch (e) {
       throw Exception(

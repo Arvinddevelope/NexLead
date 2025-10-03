@@ -352,7 +352,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   Future<void> _launchWhatsApp(String phoneNumber, String message) async {
     // Remove any non-digit characters from phone number
-    final cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+    String cleanPhoneNumber = phoneNumber.replaceAll(RegExp(r'[^\d]'), '');
+
+    // Add country code 91 if not already present and number length suggests Indian number
+    // Indian mobile numbers are 10 digits, so if we have 10 digits, add 91 prefix
+    if (cleanPhoneNumber.length == 10) {
+      cleanPhoneNumber = '91$cleanPhoneNumber';
+    }
+
     final Uri launchUri = Uri(
       scheme: 'https',
       host: 'wa.me',

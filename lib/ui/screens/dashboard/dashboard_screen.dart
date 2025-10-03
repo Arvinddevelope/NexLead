@@ -5,7 +5,6 @@ import 'package:nextlead/core/constants/app_colors.dart';
 import 'package:nextlead/core/constants/app_texts.dart';
 import 'package:nextlead/core/utils/helpers.dart';
 import 'package:nextlead/data/models/lead_model.dart';
-import 'package:nextlead/data/models/task_model.dart';
 import 'package:nextlead/providers/lead_provider.dart';
 import 'package:nextlead/providers/notification_provider.dart';
 import 'package:nextlead/providers/task_provider.dart';

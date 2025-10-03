@@ -13,7 +13,10 @@ class Lead {
   final String? userId;
   // New fields based on your requirements (only fields that exist in Airtable)
   final String? contactName;
-  // Note: Removed lastStatus and lastSource as they don't exist in Airtable
+  // Location fields
+  final double? latitude;
+  final double? longitude;
+  final String? locationAddress;
 
   Lead({
     required this.id,
@@ -29,6 +32,10 @@ class Lead {
     this.nextFollowUp,
     this.userId,
     this.contactName,
+    // Location fields
+    this.latitude,
+    this.longitude,
+    this.locationAddress,
     // Note: Removed lastStatus and lastSource as they don't exist in Airtable
   });
 
@@ -49,6 +56,10 @@ class Lead {
           : null,
       userId: json['userId'] as String?,
       contactName: json['contactName'] as String?,
+      // Location fields
+      latitude: json['latitude'] as double?,
+      longitude: json['longitude'] as double?,
+      locationAddress: json['locationAddress'] as String?,
       // Note: Removed lastStatus and lastSource as they don't exist in Airtable
     );
   }
@@ -68,6 +79,10 @@ class Lead {
       'nextFollowUp': nextFollowUp?.toIso8601String(),
       'userId': userId,
       'contactName': contactName,
+      // Location fields
+      'latitude': latitude,
+      'longitude': longitude,
+      'locationAddress': locationAddress,
       // Note: Removed lastStatus and lastSource as they don't exist in Airtable
     };
   }
@@ -86,6 +101,10 @@ class Lead {
     DateTime? nextFollowUp,
     String? userId,
     String? contactName,
+    // Location fields
+    double? latitude,
+    double? longitude,
+    String? locationAddress,
     // Note: Removed lastStatus and lastSource as they don't exist in Airtable
   }) {
     return Lead(
@@ -102,6 +121,10 @@ class Lead {
       nextFollowUp: nextFollowUp ?? this.nextFollowUp,
       userId: userId ?? this.userId,
       contactName: contactName ?? this.contactName,
+      // Location fields
+      latitude: latitude ?? this.latitude,
+      longitude: longitude ?? this.longitude,
+      locationAddress: locationAddress ?? this.locationAddress,
       // Note: Removed lastStatus and lastSource as they don't exist in Airtable
     );
   }

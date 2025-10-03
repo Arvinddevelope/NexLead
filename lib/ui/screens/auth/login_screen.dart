@@ -41,8 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
     final emailError = Validators.validateEmail(_emailController.text);
     if (emailError != null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: const Text('Please enter a valid email address'),
+        const SnackBar(
+          content: Text('Please enter a valid email address'),
           backgroundColor: AppColors.statusLost,
         ),
       );

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:nextlead/core/constants/app_colors.dart';
 import 'package:nextlead/core/constants/app_texts.dart';
 import 'package:nextlead/core/utils/validators.dart';
@@ -26,11 +28,15 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
   late final TextEditingController _notesController;
   late final TextEditingController _contactNameController;
   late final TextEditingController _nextFollowUpController;
+  late final TextEditingController _locationController;
 
   String _selectedStatus = 'New';
   String _selectedSource = '';
   DateTime? _nextFollowUpDate;
   TimeOfDay? _nextFollowUpTime;
+  double? _latitude;
+  double? _longitude;
+  String _locationAddress = '';
 
   // Enhanced status options to match Airtable validation
   final List<String> _statusOptions = [
@@ -65,9 +71,14 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
       _notesController = TextEditingController(text: widget.lead!.notes);
       _contactNameController =
           TextEditingController(text: widget.lead!.contactName ?? '');
+      _locationController =
+          TextEditingController(text: widget.lead!.locationAddress ?? '');
       _selectedStatus = widget.lead!.status;
       _selectedSource = widget.lead!.source;
       _nextFollowUpDate = widget.lead!.nextFollowUp;
+      _latitude = widget.lead!.latitude;
+      _longitude = widget.lead!.longitude;
+      _locationAddress = widget.lead!.locationAddress ?? '';
     } else {
       _nameController = TextEditingController();
       _emailController = TextEditingController();
@@ -76,6 +87,7 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
       _sourceController = TextEditingController();
       _notesController = TextEditingController();
       _contactNameController = TextEditingController();
+      _locationController = TextEditingController();
     }
   }
 
@@ -89,6 +101,7 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
     _notesController.dispose();
     _contactNameController.dispose();
     _nextFollowUpController.dispose();
+    _locationController.dispose();
     super.dispose();
   }
 
@@ -133,6 +146,127 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
     );
   }
 
+  /// Check if location permissions are granted
+  Future<bool> _checkLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    // Test if location services are enabled
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location services are disabled.'),
+            backgroundColor: AppColors.statusLost,
+          ),
+        );
+      }
+      return false;
+    }
+
+    // Check location permission
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Location permissions are denied.'),
+              backgroundColor: AppColors.statusLost,
+            ),
+          );
+        }
+        return false;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Location permissions are permanently denied.'),
+            backgroundColor: AppColors.statusLost,
+          ),
+        );
+      }
+      return false;
+    }
+
+    return true;
+  }
+
+  /// Get current location
+  Future<void> _getCurrentLocation() async {
+    final hasPermission = await _checkLocationPermission();
+    if (!hasPermission) return;
+
+    try {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Getting current location...'),
+            backgroundColor: AppColors.primary,
+          ),
+        );
+      }
+
+      final Position position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      setState(() {
+        _latitude = position.latitude;
+        _longitude = position.longitude;
+      });
+
+      // Get address from coordinates
+      await _getAddressFromCoordinates();
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error getting location: $e'),
+            backgroundColor: AppColors.statusLost,
+          ),
+        );
+      }
+    }
+  }
+
+  /// Get address from coordinates
+  Future<void> _getAddressFromCoordinates() async {
+    if (_latitude == null || _longitude == null) return;
+
+    try {
+      final List<Placemark> placemarks = await placemarkFromCoordinates(
+        _latitude!,
+        _longitude!,
+      );
+
+      if (placemarks.isNotEmpty) {
+        final Placemark place = placemarks[0];
+        final address =
+            '${place.street ?? ''}, ${place.subLocality ?? ''}, ${place.locality ?? ''}, ${place.administrativeArea ?? ''}, ${place.country ?? ''}';
+
+        setState(() {
+          _locationAddress = address;
+          _locationController.text = address;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error getting address: $e'),
+            backgroundColor: AppColors.statusLost,
+          ),
+        );
+      }
+    }
+  }
+
   Future<void> _saveLead() async {
     if (_formKey.currentState!.validate()) {
       final leadProvider = Provider.of<LeadProvider>(context, listen: false);
@@ -158,9 +292,16 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
             updatedAt: now,
             nextFollowUp: combinedDateTime,
             contactName: _contactNameController.text.trim(),
+            // Location fields
+            latitude: _latitude,
+            longitude: _longitude,
+            locationAddress: _locationAddress,
           );
 
           await leadProvider.createLead(newLead);
+          if (mounted) {
+            Navigator.pop(context, true); // Return true to indicate success
+          }
         } else {
           // Update existing lead
           final updatedLead = widget.lead!.copyWith(
@@ -176,13 +317,16 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
             updatedAt: now,
             nextFollowUp: combinedDateTime,
             contactName: _contactNameController.text.trim(),
+            // Location fields
+            latitude: _latitude,
+            longitude: _longitude,
+            locationAddress: _locationAddress,
           );
 
           await leadProvider.updateLead(updatedLead);
-        }
-
-        if (mounted) {
-          Navigator.pop(context); // Go back to previous screen
+          if (mounted) {
+            Navigator.pop(context, true); // Return true to indicate success
+          }
         }
       } catch (e) {
         if (mounted) {
@@ -365,6 +509,39 @@ class _LeadFormScreenState extends State<LeadFormScreen> {
                   onTap: _selectTime,
                 ),
               if (_nextFollowUpDate != null) const SizedBox(height: 16),
+
+              // Location
+              const Text(
+                'Location',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Current Location Button
+              ElevatedButton.icon(
+                onPressed: _getCurrentLocation,
+                icon: const Icon(Icons.my_location),
+                label: const Text('Get Current Location'),
+              ),
+              const SizedBox(height: 16),
+
+              // Location Address
+              TextFormField(
+                controller: _locationController,
+                decoration: const InputDecoration(
+                  labelText: 'Location Address',
+                  hintText: 'Enter location address',
+                ),
+                onChanged: (value) {
+                  setState(() {
+                    _locationAddress = value;
+                  });
+                },
+              ),
+              const SizedBox(height: 16),
 
               // Notes
               TextFormField(

@@ -9,3 +9,7 @@ Notes,Long text,Additional information about the lead,No
 Created At,Created time,Timestamp when record was created,Yes
 Updated At,Last modified time,Timestamp when record was last updated,Yes
 Next Follow-up,Date,Planned follow-up date,No
+Contact Name,Single line text,Contact person name,No
+Latitude,Number,Latitude coordinate,No
+Longitude,Number,Longitude coordinate,No
+Location Address,Single line text,Location address,No
